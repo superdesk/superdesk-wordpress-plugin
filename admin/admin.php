@@ -1,0 +1,184 @@
+<?php
+add_action('admin_menu', 'mvp_admin_actions');
+
+add_filter('plugin_action_links_mvp/mvp.php', '_plugin_action_links');
+
+function mvp_admin_actions() {
+  add_options_page('MVP', 'Superdesk Publisher', 'manage_options', __FILE__, 'mvp_admin');
+}
+
+function _plugin_action_links($links) {
+  $links[] = '<a href="' . esc_url(get_page_url()) . '">Settings</a>';
+  return $links;
+}
+
+function get_page_url() {
+
+  $args = array('page' => 'mvp/admin/admin');
+
+  $url = add_query_arg($args, admin_url('options-general.php'));
+
+  return $url;
+}
+
+function mvp_admin() {
+  if (isset($_POST['url'])) {
+    $settings = array(
+        'url' => $_POST['url'],
+        'username' => $_POST['username'],
+        'password' => $_POST['password'],
+        'client_id' => $_POST['client_id'],
+        'status' => $_POST['status'],
+        'author' => $_POST['author'],
+        'category' => $_POST['category'],
+    );
+    update_option('mvp_settings', $settings);
+  } else if (get_option('mvp_settings')) {
+    $settings = get_option('mvp_settings');
+  } else {
+    $settings = array(
+        'url' => '',
+        'client_id' => '',
+        'username' => '',
+        'password' => '',
+        'status' => 'publish',
+        'author' => '',
+        'category' => '',
+    );
+  }
+  $statuses = array(
+      'publish' => 'Published',
+      'draft' => 'Draft'
+  );
+
+  $authors = array();
+
+  $categories = array();
+
+  $args = array(
+      'hide_empty' => 0,
+  );
+  $all_categories = get_categories($args);
+
+  foreach ($all_categories as $category) {
+    $categories[$category->cat_ID] = $category->cat_name;
+  }
+
+  $all_users = get_users();
+  foreach ($all_users as $user) {
+    $authors[$user->ID] = $user->data->display_name;
+  }
+  ?>
+  <div class="wrap">
+    <h2>Superdesk Publisher</h2>
+    <form action="" method="POST">
+      <table class="form-table">
+        <tbody>
+          <tr>
+            <th>Autoload</th>
+            <td><?php echo get_site_url(); ?>/wp-content/plugins/mvp/autoload.php</td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <label for="url">SD (content API) URL</label>
+            </th>
+            <td>
+              <input type="text" name="url" id="url" class="regular-text code" value="<?php echo($settings['url']); ?>">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <label for="client_id">Client ID</label>
+            </th>
+            <td>
+              <input type="text" name="client_id" id="client_id" class="regular-text" value="<?php echo($settings['client_id']); ?>">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <label for="username">Username</label>
+            </th>
+            <td>
+              <input type="text" name="username" id="username" class="regular-text" value="<?php echo($settings['username']); ?>">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <label for="password">Password</label>
+            </th>
+            <td>
+              <input type="password" name="password" id="password" class="regular-text" value="<?php echo($settings['password']); ?>">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              Status of the ingested articles/posts
+            </th>
+            <td>
+              <fieldset>
+                <?php
+                foreach ($statuses as $key => $value) {
+                  ?>
+                  <label for="status-<?php echo($key); ?>">
+                    <input type="radio" name="status" id="status-<?php echo($key); ?>" value="<?php echo($key); ?>"<?php
+                    if ($key == $settings['status']) {
+                      echo(' checked');
+                    }
+                    ?>> <?php echo($value); ?>
+                  </label>
+                  <br>
+                  <?php
+                }
+                ?>
+              </fieldset>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <label for="author">Author</label>
+            </th>
+            <td>
+              <select name="author" id="author">
+                <?php
+                foreach ($authors as $key => $value) {
+                  ?>
+                  <option value="<?php echo($key); ?>"<?php
+                  if ($key == $settings['author']) {
+                    echo(' selected');
+                  }
+                  ?>><?php echo($value); ?></option>
+                          <?php
+                        }
+                        ?>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <label for="category">Category</label>
+            </th>
+            <td>
+              <select name="category[]" id="category" multiple>
+                <?php
+                foreach ($categories as $key => $value) {
+                  ?>
+                  <option value="<?php echo($key); ?>"<?php
+                  if (in_array($key, $settings['category'])) {
+                    echo(' selected');
+                  }
+                  ?>><?php echo($value); ?></option>
+                          <?php
+                        }
+                        ?>
+              </select>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="submit">
+        <input type="submit" name="submit" id="submit" class="button button-primary" value="Save">
+      </p>
+    </form>
+  </div>
+  <?php
+}

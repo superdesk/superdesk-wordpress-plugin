@@ -1,0 +1,1 @@
+# superdesk-wordpress-plugin
