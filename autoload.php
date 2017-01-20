@@ -5,7 +5,7 @@ require_once '../../../wp-load.php';
 $json = file_get_contents('php://input');
 //$json = file_get_contents('log.txt');
 
-//file_put_contents('log.txt', $json . "\n\n", FILE_APPEND);
+file_put_contents('log.txt', $json . "\n\n", FILE_APPEND);
 $obj = json_decode($json, true);
 
 if ($obj['type'] == 'composite') {
@@ -14,6 +14,10 @@ if ($obj['type'] == 'composite') {
 
   if ($obj['pubstatus'] == 'usable') {
     $content = $obj['description_html'] . "<!--more-->" . $obj['body_html'];
+
+    if ($settings['display-copyright'] == "on") {
+      $content.= ""; // $obj['copyrightnotice']
+    }
 
     $guid = wp_strip_all_tags($obj['guid']);
 
