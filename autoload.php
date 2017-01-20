@@ -5,7 +5,8 @@ require_once '../../../wp-load.php';
 $json = file_get_contents('php://input');
 //$json = file_get_contents('log.txt');
 
-file_put_contents('log.txt', $json . "\n\n", FILE_APPEND);
+//file_put_contents('log.txt', $json . "\n\n", FILE_APPEND);
+//die();
 $obj = json_decode($json, true);
 
 if ($obj['type'] == 'composite') {
@@ -57,6 +58,27 @@ if ($obj['type'] == 'composite') {
         $author_id = $settings['author'];
       }
 
+      foreach ($obj['service'] as $service) {
+        if ($settings['subject-type'] == 'tags') {
+          $taxonomyTag[] = wp_strip_all_tags($service['name']);
+        } elseif ($settings['subject-type'] == 'categories') {
+          $categoryExist = $wpdb->get_row("SELECT terms.term_id, term_taxonomy.term_taxonomy_id FROM " . $wpdb->prefix . "terms terms JOIN " . $wpdb->prefix . "term_taxonomy term_taxonomy ON term_taxonomy.term_id = terms.term_id WHERE term_taxonomy.taxonomy = 'category' AND terms.name = '" . wp_strip_all_tags($service['name']) . "'");
+
+          if ($categoryExist) {
+            $taxonomyCategory[] = $categoryExist->term_taxonomy_id;
+          } else {
+            $category_id = wp_insert_term(wp_strip_all_tags($service['name']), 'category');
+            $taxonomyCategory[] = $category_id['term_taxonomy_id'];
+          }
+        }
+      }
+
+      if ($taxonomyCategory && !empty($taxonomyCategory)) {
+        $category = $taxonomyCategory;
+      } else {
+        $category = $settings['category'];
+      }
+
       $postarr = array(
           'post_title' => wp_strip_all_tags($obj['headline']),
           'post_name' => wp_strip_all_tags($obj['headline']),
@@ -64,10 +86,14 @@ if ($obj['type'] == 'composite') {
           'post_content_filtered' => $content,
           'post_author' => (int) $author_id,
           'post_status' => $settings['status'],
-          'post_category' => $settings['category'],
+          'post_category' => $category,
       );
 
       $post_ID = wp_insert_post($postarr, true);
+
+      if ($taxonomyTag && !empty($taxonomyTag)) {
+        wp_set_post_tags($post_ID, $taxonomyTag);
+      }
 
       $table_name = $wpdb->prefix . DB_TABLE_SYNC_POST;
 
@@ -78,7 +104,6 @@ if ($obj['type'] == 'composite') {
           'time' => current_time('mysql')
               )
       );
-
 
       if ($obj['associations']['featuremedia'] && $obj['associations']['featuremedia']['type'] == 'picture') {
         /* save featured media */

@@ -32,6 +32,7 @@ function mvp_admin() {
         'author' => $_POST['author'],
         'author-byline' => $_POST['author-byline'],
         'display-copyright' => $_POST['display-copyright'],
+        'subject-type' => $_POST['subject-type'],
         'category' => $_POST['category'],
     );
     update_option('mvp_settings', $settings);
@@ -47,6 +48,7 @@ function mvp_admin() {
         'author' => '',
         'author-byline' => '',
         'display-copyright' => '',
+        'subject-type' => '',
         'category' => '',
     );
   }
@@ -181,6 +183,30 @@ function mvp_admin() {
                     echo(' checked');
                   }
                   ?>> on
+                </label>
+              </fieldset>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              Import Superdesk subjects as
+            </th>
+            <td>
+              <fieldset>
+                <label for="tags">
+                  <input type="radio" name="subject-type" id="tags" value="tags"<?php
+                  if ($settings['subject-type'] == 'tags' || !$settings['subject-type'] || $settings['subject-type'] == null) {
+                    echo(' checked');
+                  }
+                  ?>> Wordpress tags
+                </label>
+                <br>
+                <label for="categories">
+                  <input type="radio" name="subject-type" id="categories" value="categories"<?php
+                  if ($settings['subject-type'] == 'categories') {
+                    echo(' checked');
+                  }
+                  ?>> Wordpress categories
                 </label>
               </fieldset>
             </td>
