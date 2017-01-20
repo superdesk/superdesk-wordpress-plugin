@@ -30,6 +30,7 @@ function mvp_admin() {
         'client_id' => $_POST['client_id'],
         'status' => $_POST['status'],
         'author' => $_POST['author'],
+        'author-byline' => $_POST['author-byline'],
         'category' => $_POST['category'],
     );
     update_option('mvp_settings', $settings);
@@ -43,6 +44,7 @@ function mvp_admin() {
         'password' => '',
         'status' => 'publish',
         'author' => '',
+        'author-byline' => '',
         'category' => '',
     );
   }
@@ -138,7 +140,7 @@ function mvp_admin() {
               <label for="author">Author</label>
             </th>
             <td>
-              <select name="author" id="author">
+              <select name="author" id="author" <?php echo ($settings['author-byline']) ? 'disabled="true"' : ""; ?>>
                 <?php
                 foreach ($authors as $key => $value) {
                   ?>
@@ -151,6 +153,10 @@ function mvp_admin() {
                         }
                         ?>
               </select>
+              <br /><br />
+              <label>
+                <input type="checkbox" name="author-byline" <?php echo ($settings['author-byline']) ? "checked" : ""; ?> onclick="setAuthor()"> Show byline in posts
+              </label>
             </td>
           </tr>
           <tr>
@@ -180,5 +186,10 @@ function mvp_admin() {
       </p>
     </form>
   </div>
+<script type="text/javascript">
+function setAuthor() {
+  console.log('zavolano');
+}
+</script>
   <?php
 }

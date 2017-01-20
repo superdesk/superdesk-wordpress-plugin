@@ -26,6 +26,7 @@ define('MVP_PLUGIN_URL', untrailingslashit(plugins_url('', MVP_PLUGIN)));
 define('MVP_DATABASE_VERSION', '2');
 
 define('DB_TABLE_SYNC_POST', 'sync_posts');
+define('DB_TABLE_USERS', 'users');
 
 
 require_once MVP_PLUGIN_DIR . '/settings.php';
@@ -67,6 +68,17 @@ function saveFile($from, $to) {
 
   curl_close($ch);
   fclose($fp);
+}
+
+function generatePassword() {
+  $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ%./\@';
+  $charactersLength = strlen($characters);
+  $password = '';
+  for ($i = 0; $i < 8; $i++) {
+    $password .= $characters[rand(0, $charactersLength - 1)];
+  }
+  $password = $password . strtotime("now");
+  return $password;
 }
 
 register_activation_hook(__FILE__, 'mvp_database_install');
