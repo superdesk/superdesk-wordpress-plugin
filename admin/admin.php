@@ -32,6 +32,8 @@ function mvp_admin() {
         'author' => $_POST['author'],
         'author-byline' => $_POST['author-byline'],
         'display-copyright' => $_POST['display-copyright'],
+        'convert-keywords' => $_POST['convert-keywords'],
+        'convert-services' => $_POST['convert-services'],
         'subject-type' => $_POST['subject-type'],
         'category' => $_POST['category'],
     );
@@ -48,6 +50,8 @@ function mvp_admin() {
         'author' => '',
         'author-byline' => '',
         'display-copyright' => '',
+        'convert-keywords' => '',
+        'convert-services' => '',
         'subject-type' => '',
         'category' => '',
     );
@@ -180,6 +184,54 @@ function mvp_admin() {
                 <label for="status-on">
                   <input type="radio" name="display-copyright" id="status-on" value="on"<?php
                   if ($settings['display-copyright'] == 'on') {
+                    echo(' checked');
+                  }
+                  ?>> on
+                </label>
+              </fieldset>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              Convert slugline keywords into WP tags
+            </th>
+            <td>
+              <fieldset>
+                <label for="off">
+                  <input type="radio" name="convert-keywords" id="off" value="off"<?php
+                  if ($settings['convert-keywords'] == 'off') {
+                    echo(' checked');
+                  }
+                  ?>> off
+                </label>
+                <br>
+                <label for="on">
+                  <input type="radio" name="convert-keywords" id="on" value="on"<?php
+                  if ($settings['convert-keywords'] == 'on') {
+                    echo(' checked');
+                  }
+                  ?>> on
+                </label>
+              </fieldset>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              Convert services as Category
+            </th>
+            <td>
+              <fieldset>
+                <label for="off">
+                  <input type="radio" name="convert-services" id="off" value="off"<?php
+                  if ($settings['convert-services'] == 'off') {
+                    echo(' checked');
+                  }
+                  ?>> off
+                </label>
+                <br>
+                <label for="on">
+                  <input type="radio" name="convert-services" id="on" value="on"<?php
+                  if ($settings['convert-services'] == 'on') {
                     echo(' checked');
                   }
                   ?>> on

@@ -5,8 +5,8 @@ require_once '../../../wp-load.php';
 $json = file_get_contents('php://input');
 //$json = file_get_contents('log.txt');
 
-//file_put_contents('log.txt', $json . "\n\n", FILE_APPEND);
-//die();
+file_put_contents('log.txt', $json . "\n\n", FILE_APPEND);
+
 $obj = json_decode($json, true);
 
 if ($obj['type'] == 'composite') {
@@ -16,8 +16,8 @@ if ($obj['type'] == 'composite') {
   if ($obj['pubstatus'] == 'usable') {
     $content = $obj['description_html'] . "<!--more-->" . $obj['body_html'];
 
-    if ($settings['display-copyright'] == "on") {
-      $content.= ""; // $obj['copyrightnotice']
+    if ($settings['display-copyright'] == "on" && isset($obj['associations']['featuremedia']['copyrightnotice'])) {
+      $content.= "<p>" . wp_strip_all_tags($obj['associations']['featuremedia']['copyrightnotice']) . "</p>";
     }
 
     $guid = wp_strip_all_tags($obj['guid']);
@@ -58,10 +58,27 @@ if ($obj['type'] == 'composite') {
         $author_id = $settings['author'];
       }
 
-      foreach ($obj['service'] as $service) {
+      if ($settings['convert-keywords'] && $settings['convert-keywords'] == 'on') {
+        
+      }
+
+      foreach ($obj['subject'] as $subject) {
         if ($settings['subject-type'] == 'tags') {
-          $taxonomyTag[] = wp_strip_all_tags($service['name']);
+          $taxonomyTag[] = wp_strip_all_tags($subject['name']);
         } elseif ($settings['subject-type'] == 'categories') {
+          $categoryExist = $wpdb->get_row("SELECT terms.term_id, term_taxonomy.term_taxonomy_id FROM " . $wpdb->prefix . "terms terms JOIN " . $wpdb->prefix . "term_taxonomy term_taxonomy ON term_taxonomy.term_id = terms.term_id WHERE term_taxonomy.taxonomy = 'category' AND terms.name = '" . wp_strip_all_tags($subject['name']) . "'");
+
+          if ($categoryExist) {
+            $taxonomyCategory[] = $categoryExist->term_taxonomy_id;
+          } else {
+            $category_id = wp_insert_term(wp_strip_all_tags($subject['name']), 'category');
+            $taxonomyCategory[] = $category_id['term_taxonomy_id'];
+          }
+        }
+      }
+
+      if ($settings['convert-services'] == 'on') {
+        foreach ($obj['service'] as $service) {
           $categoryExist = $wpdb->get_row("SELECT terms.term_id, term_taxonomy.term_taxonomy_id FROM " . $wpdb->prefix . "terms terms JOIN " . $wpdb->prefix . "term_taxonomy term_taxonomy ON term_taxonomy.term_id = terms.term_id WHERE term_taxonomy.taxonomy = 'category' AND terms.name = '" . wp_strip_all_tags($service['name']) . "'");
 
           if ($categoryExist) {
