@@ -26,6 +26,40 @@ if ($obj['type'] == 'text') {
       $guid = wp_strip_all_tags($obj['guid']);
     }
 
+    foreach ($obj['subject'] as $subject) {
+      if ($settings['subject-type'] == 'tags') {
+        $taxonomyTag[] = wp_strip_all_tags($subject['name']);
+      } elseif ($settings['subject-type'] == 'categories') {
+        $categoryExist = $wpdb->get_row("SELECT terms.term_id, term_taxonomy.term_taxonomy_id FROM " . $wpdb->prefix . "terms terms JOIN " . $wpdb->prefix . "term_taxonomy term_taxonomy ON term_taxonomy.term_id = terms.term_id WHERE term_taxonomy.taxonomy = 'category' AND terms.name = '" . wp_strip_all_tags($subject['name']) . "'");
+
+        if ($categoryExist) {
+          $taxonomyCategory[] = $categoryExist->term_taxonomy_id;
+        } else {
+          $category_id = wp_insert_term(wp_strip_all_tags($subject['name']), 'category');
+          $taxonomyCategory[] = $category_id['term_taxonomy_id'];
+        }
+      }
+    }
+
+    if ($settings['convert-services'] == 'on') {
+      foreach ($obj['service'] as $service) {
+        $categoryExist = $wpdb->get_row("SELECT terms.term_id, term_taxonomy.term_taxonomy_id FROM " . $wpdb->prefix . "terms terms JOIN " . $wpdb->prefix . "term_taxonomy term_taxonomy ON term_taxonomy.term_id = terms.term_id WHERE term_taxonomy.taxonomy = 'category' AND terms.name = '" . wp_strip_all_tags($service['name']) . "'");
+
+        if ($categoryExist) {
+          $taxonomyCategory[] = $categoryExist->term_taxonomy_id;
+        } else {
+          $category_id = wp_insert_term(wp_strip_all_tags($service['name']), 'category');
+          $taxonomyCategory[] = $category_id['term_taxonomy_id'];
+        }
+      }
+    }
+
+    if ($taxonomyCategory && !empty($taxonomyCategory)) {
+      $category = $taxonomyCategory;
+    } else {
+      $category = $settings['category'];
+    }
+
     $sync = $wpdb->get_row("SELECT post_id FROM " . $wpdb->prefix . DB_TABLE_SYNC_POST . " WHERE guid = '" . $guid . "'");
 
     if ($sync) {
@@ -35,7 +69,8 @@ if ($obj['type'] == 'text') {
           'post_title' => wp_strip_all_tags($obj['headline']),
           'post_name' => wp_strip_all_tags($obj['headline']),
           'post_content' => $content,
-          'post_content_filtered' => $content
+          'post_content_filtered' => $content,
+          'post_category' => $category
       );
 
       wp_update_post($edit_post);
@@ -79,40 +114,6 @@ if ($obj['type'] == 'text') {
 
       if ($settings['convert-keywords'] && $settings['convert-keywords'] == 'on') {
         
-      }
-
-      foreach ($obj['subject'] as $subject) {
-        if ($settings['subject-type'] == 'tags') {
-          $taxonomyTag[] = wp_strip_all_tags($subject['name']);
-        } elseif ($settings['subject-type'] == 'categories') {
-          $categoryExist = $wpdb->get_row("SELECT terms.term_id, term_taxonomy.term_taxonomy_id FROM " . $wpdb->prefix . "terms terms JOIN " . $wpdb->prefix . "term_taxonomy term_taxonomy ON term_taxonomy.term_id = terms.term_id WHERE term_taxonomy.taxonomy = 'category' AND terms.name = '" . wp_strip_all_tags($subject['name']) . "'");
-
-          if ($categoryExist) {
-            $taxonomyCategory[] = $categoryExist->term_taxonomy_id;
-          } else {
-            $category_id = wp_insert_term(wp_strip_all_tags($subject['name']), 'category');
-            $taxonomyCategory[] = $category_id['term_taxonomy_id'];
-          }
-        }
-      }
-
-      if ($settings['convert-services'] == 'on') {
-        foreach ($obj['service'] as $service) {
-          $categoryExist = $wpdb->get_row("SELECT terms.term_id, term_taxonomy.term_taxonomy_id FROM " . $wpdb->prefix . "terms terms JOIN " . $wpdb->prefix . "term_taxonomy term_taxonomy ON term_taxonomy.term_id = terms.term_id WHERE term_taxonomy.taxonomy = 'category' AND terms.name = '" . wp_strip_all_tags($service['name']) . "'");
-
-          if ($categoryExist) {
-            $taxonomyCategory[] = $categoryExist->term_taxonomy_id;
-          } else {
-            $category_id = wp_insert_term(wp_strip_all_tags($service['name']), 'category');
-            $taxonomyCategory[] = $category_id['term_taxonomy_id'];
-          }
-        }
-      }
-
-      if ($taxonomyCategory && !empty($taxonomyCategory)) {
-        $category = $taxonomyCategory;
-      } else {
-        $category = $settings['category'];
       }
 
       $postarr = array(

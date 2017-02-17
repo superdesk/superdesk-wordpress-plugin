@@ -145,7 +145,7 @@ function mvp_admin() {
           </tr>
           <tr>
             <th scope="row">
-              <label for="author">Author</label>
+              <label for="author">Default author</label>
             </th>
             <td>
               <select name="author" id="author">
@@ -217,7 +217,7 @@ function mvp_admin() {
           </tr>
           <tr>
             <th scope="row">
-              Convert services as Category
+              Import Superdesk categories as Wordpress categories
             </th>
             <td>
               <fieldset>
@@ -265,7 +265,7 @@ function mvp_admin() {
           </tr>
           <tr>
             <th scope="row">
-              <label for="category">Category</label>
+              <label for="category">Default category</label>
             </th>
             <td>
               <select name="category[]" id="category" multiple>
