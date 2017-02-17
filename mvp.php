@@ -26,6 +26,7 @@ define('MVP_PLUGIN_URL', untrailingslashit(plugins_url('', MVP_PLUGIN)));
 define('MVP_DATABASE_VERSION', '2');
 
 define('DB_TABLE_SYNC_POST', 'sync_posts');
+define('DB_TABLE_POSTMETA', 'postmeta');
 define('DB_TABLE_USERS', 'users');
 
 
@@ -79,6 +80,29 @@ function generatePassword() {
   }
   $password = $password . strtotime("now");
   return $password;
+}
+
+function saveAttachment($picture, $post_ID) {
+  $filenameQ = explode("/", $picture['renditions']['original']['media']);
+  $filename = $filenameQ[1];
+  saveFile($picture['renditions']['original']['href'], wp_upload_dir()['path'] . "/" . $filename);
+
+  $attachment = array(
+      'guid' => wp_upload_dir()['url'] . '/' . basename($filename),
+      'post_mime_type' => $picture['mimetype'],
+      'post_title' => preg_replace('/\.[^.]+$/', '', basename($picture['headline'])),
+      'post_content' => '',
+      'post_status' => 'inherit'
+  );
+
+  $attach_id = wp_insert_attachment($attachment, date("Y") . "/" . date("m") . "/" . $filename, $post_ID);
+
+  require_once( ABSPATH . 'wp-admin/includes/image.php' );
+
+  $attach_data = wp_generate_attachment_metadata($attach_id, wp_upload_dir()['path'] . "/" . $filename);
+
+  wp_update_attachment_metadata($attach_id, $attach_data);
+  set_post_thumbnail($post_ID, $attach_id);
 }
 
 register_activation_hook(__FILE__, 'mvp_database_install');

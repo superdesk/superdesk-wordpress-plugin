@@ -6,10 +6,10 @@ $json = file_get_contents('php://input');
 //$json = file_get_contents('log.txt');
 
 file_put_contents('log.txt', $json . "\n\n", FILE_APPEND);
-
+//die();
 $obj = json_decode($json, true);
-
-if ($obj['type'] == 'composite') {
+/* var_dump($obj);die(); */
+if ($obj['type'] == 'text') {
 
   $settings = get_option('mvp_settings');
 
@@ -20,11 +20,16 @@ if ($obj['type'] == 'composite') {
       $content.= "<p>" . wp_strip_all_tags($obj['associations']['featuremedia']['copyrightnotice']) . "</p>";
     }
 
-    $guid = wp_strip_all_tags($obj['guid']);
+    if (isset($obj['evolvedfrom'])) {
+      $guid = wp_strip_all_tags($obj['evolvedfrom']);
+    } else {
+      $guid = wp_strip_all_tags($obj['guid']);
+    }
 
     $sync = $wpdb->get_row("SELECT post_id FROM " . $wpdb->prefix . DB_TABLE_SYNC_POST . " WHERE guid = '" . $guid . "'");
 
     if ($sync) {
+      $post_ID = $sync->post_id;
       $edit_post = array(
           'ID' => $sync->post_id,
           'post_title' => wp_strip_all_tags($obj['headline']),
@@ -34,6 +39,20 @@ if ($obj['type'] == 'composite') {
       );
 
       wp_update_post($edit_post);
+
+      $attachmentExist = get_post_thumbnail_id($post_ID);
+
+      if ($attachmentExist) {
+        wp_delete_attachment($attachmentExist);
+      }
+
+      $wpdb->insert(
+              $wpdb->prefix . DB_TABLE_SYNC_POST, array(
+          'post_id' => $post_ID,
+          'guid' => wp_strip_all_tags($obj['guid']),
+          'time' => current_time('mysql')
+              )
+      );
     } else {
 
       if ($settings['author-byline'] && $settings['author-byline'] == 'on') {
@@ -121,32 +140,11 @@ if ($obj['type'] == 'composite') {
           'time' => current_time('mysql')
               )
       );
+    }
 
-      if ($obj['associations']['featuremedia'] && $obj['associations']['featuremedia']['type'] == 'picture') {
-        /* save featured media */
-        $picture = $obj['associations']['featuremedia'];
-
-        $filenameQ = explode("/", $picture['renditions']['original']['media']);
-        $filename = $filenameQ[1];
-        saveFile($picture['renditions']['original']['href'], wp_upload_dir()['path'] . "/" . $filename);
-
-        $attachment = array(
-            'guid' => wp_upload_dir()['url'] . '/' . basename($filename),
-            'post_mime_type' => $picture['mimetype'],
-            'post_title' => preg_replace('/\.[^.]+$/', '', basename($picture['headline'])),
-            'post_content' => '',
-            'post_status' => 'inherit'
-        );
-
-        $attach_id = wp_insert_attachment($attachment, date("Y") . "/" . date("m") . "/" . $filename, $post_ID);
-
-        require_once( ABSPATH . 'wp-admin/includes/image.php' );
-
-        $attach_data = wp_generate_attachment_metadata($attach_id, wp_upload_dir()['path'] . "/" . $filename);
-
-        wp_update_attachment_metadata($attach_id, $attach_data);
-        set_post_thumbnail($post_ID, $attach_id);
-      }
+    /* save featured media */
+    if ($obj['associations']['featuremedia'] && $obj['associations']['featuremedia']['type'] == 'picture') {
+      saveAttachment($obj['associations']['featuremedia'], $post_ID);
     }
   } elseif ($obj['pubstatus'] == 'canceled') {
     /* remove article */
