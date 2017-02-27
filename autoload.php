@@ -6,9 +6,9 @@ $json = file_get_contents('php://input');
 //$json = file_get_contents('log.txt');
 
 file_put_contents('log.txt', $json . "\n\n", FILE_APPEND);
-//die();
+
 $obj = json_decode($json, true);
-/* var_dump($obj);die(); */
+
 if ($obj['type'] == 'text') {
 
   $settings = get_option('mvp_settings');
@@ -91,7 +91,13 @@ if ($obj['type'] == 'text') {
     } else {
 
       if ($settings['author-byline'] && $settings['author-byline'] == 'on') {
-        $author_name = str_replace("By ", "", $obj['byline']);
+        $author_name = $obj['byline'];
+        if (!empty(trim($settings['byline-words']))) {
+          $replaceWords = explode(',', $settings['byline-words']);
+          foreach ($replaceWords as $value) {
+            $author_name = str_replace(trim($value) . " ", "", $author_name);
+          }
+        }
 
         $authorExist = $wpdb->get_row("SELECT ID user_id FROM " . $wpdb->prefix . DB_TABLE_USERS . " WHERE display_name = '" . wp_strip_all_tags($author_name) . "'");
 

@@ -31,6 +31,7 @@ function mvp_admin() {
         'status' => $_POST['status'],
         'author' => $_POST['author'],
         'author-byline' => $_POST['author-byline'],
+        'byline-words' => $_POST['byline-words'],
         'display-copyright' => $_POST['display-copyright'],
         'convert-keywords' => $_POST['convert-keywords'],
         'convert-services' => $_POST['convert-services'],
@@ -49,6 +50,7 @@ function mvp_admin() {
         'status' => 'publish',
         'author' => '',
         'author-byline' => '',
+        'byline-words' => '',
         'display-copyright' => '',
         'convert-keywords' => '',
         'convert-services' => '',
@@ -165,6 +167,14 @@ function mvp_admin() {
               <label>
                 <input type="checkbox" name="author-byline" <?php echo ($settings['author-byline']) ? "checked" : ""; ?>> Show byline in posts
               </label>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <label for="byline-words">Choose the words replace from the byline</label>
+            </th>
+            <td>
+              <input type="text" name="byline-words" id="byline-words" class="regular-text" value="<?php echo($settings['byline-words']); ?>">
             </td>
           </tr>
           <tr>
