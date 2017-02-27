@@ -81,6 +81,10 @@ if ($obj['type'] == 'text') {
         wp_delete_attachment($attachmentExist);
       }
 
+      if ($taxonomyTag && !empty($taxonomyTag)) {
+        wp_set_post_tags($post_ID, $taxonomyTag);
+      }
+
       $wpdb->insert(
               $wpdb->prefix . DB_TABLE_SYNC_POST, array(
           'post_id' => $post_ID,
