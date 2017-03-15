@@ -157,7 +157,16 @@ if ($obj['type'] == 'text') {
 
     /* save featured media */
     if ($obj['associations']['featuremedia'] && $obj['associations']['featuremedia']['type'] == 'picture') {
-      saveAttachment($obj['associations']['featuremedia'], $post_ID);
+      $filenameQ = explode("/", $obj['associations']['featuremedia']['renditions']['original']['media']);
+      $filename = $filenameQ[count($filenameQ) - 1];
+
+      $fileExist = $wpdb->get_row("SELECT meta_id, post_id FROM " . $wpdb->prefix . "postmeta WHERE meta_key = '_wp_attached_file' AND meta_value LIKE '%" . wp_strip_all_tags($filename) . "'");
+
+      if ($fileExist) {
+        set_post_thumbnail($post_ID, $fileExist->post_id);
+      } else {
+        saveAttachment($obj['associations']['featuremedia'], $post_ID);
+      }
     }
   } elseif ($obj['pubstatus'] == 'canceled') {
     /* remove article */

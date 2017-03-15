@@ -84,7 +84,8 @@ function generatePassword() {
 
 function saveAttachment($picture, $post_ID) {
   $filenameQ = explode("/", $picture['renditions']['original']['media']);
-  $filename = $filenameQ[1];
+  $filename = $filenameQ[count($filenameQ) - 1];
+
   saveFile($picture['renditions']['original']['href'], wp_upload_dir()['path'] . "/" . $filename);
 
   $attachment = array(
