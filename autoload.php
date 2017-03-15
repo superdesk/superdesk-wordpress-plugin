@@ -118,8 +118,10 @@ if ($obj['type'] == 'text') {
         } else {
           $author_id = $authorExist->user_id;
         }
-      } else {
+      } elseif ($settings['author-byline'] == 'on') {
         $author_id = $settings['author'];
+      } else {
+        $author_id = 0;
       }
 
       if ($settings['convert-keywords'] && $settings['convert-keywords'] == 'on') {
