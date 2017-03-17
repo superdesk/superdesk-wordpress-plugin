@@ -26,6 +26,14 @@ if ($obj['type'] == 'text') {
       $guid = wp_strip_all_tags($obj['guid']);
     }
 
+    if ($settings['import-keywords'] && $settings['import-keywords'] == 'on') {
+      if(isset($obj['keywords']) && count($obj['keywords']) > 0) {
+        foreach ($obj['keywords'] as $keyword) {
+          $taxonomyTag[] = wp_strip_all_tags($keyword);
+        }
+      }
+    }
+
     foreach ($obj['subject'] as $subject) {
       if ($settings['subject-type'] == 'tags') {
         $taxonomyTag[] = wp_strip_all_tags($subject['name']);
@@ -124,9 +132,9 @@ if ($obj['type'] == 'text') {
         $author_id = 0;
       }
 
-      if ($settings['convert-keywords'] && $settings['convert-keywords'] == 'on') {
-        
-      }
+      /* if ($settings['convert-keywords'] && $settings['convert-keywords'] == 'on') {
+
+        } */
 
       $postarr = array(
           'post_title' => wp_strip_all_tags($obj['headline']),

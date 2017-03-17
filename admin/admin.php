@@ -34,6 +34,7 @@ function mvp_admin() {
         'byline-words' => $_POST['byline-words'],
         'display-copyright' => $_POST['display-copyright'],
         'convert-keywords' => $_POST['convert-keywords'],
+        'import-keywords' => $_POST['import-keywords'],
         'convert-services' => $_POST['convert-services'],
         'subject-type' => $_POST['subject-type'],
         'category' => $_POST['category'],
@@ -53,6 +54,7 @@ function mvp_admin() {
         'byline-words' => '',
         'display-copyright' => '',
         'convert-keywords' => '',
+        'import-keywords' => '',
         'convert-services' => '',
         'subject-type' => '',
         'category' => '',
@@ -218,6 +220,30 @@ function mvp_admin() {
                 <label for="on">
                   <input type="radio" name="convert-keywords" id="on" value="on"<?php
                   if ($settings['convert-keywords'] == 'on') {
+                    echo(' checked');
+                  }
+                  ?>> on
+                </label>
+              </fieldset>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              Import SD keywords as WP tags
+            </th>
+            <td>
+              <fieldset>
+                <label for="off">
+                  <input type="radio" name="import-keywords" id="off" value="off"<?php
+                  if ($settings['import-keywords'] == 'off') {
+                    echo(' checked');
+                  }
+                  ?>> off
+                </label>
+                <br>
+                <label for="on">
+                  <input type="radio" name="import-keywords" id="on" value="on"<?php
+                  if ($settings['import-keywords'] == 'on') {
                     echo(' checked');
                   }
                   ?>> on
