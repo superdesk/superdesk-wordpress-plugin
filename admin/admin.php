@@ -1,10 +1,10 @@
 <?php
-add_action('admin_menu', 'mvp_admin_actions');
+add_action('admin_menu', 'superdesk_admin_actions');
 
-add_filter('plugin_action_links_mvp/mvp.php', '_plugin_action_links');
+add_filter('plugin_action_links_superdesk/superdeskPublisher.php', '_plugin_action_links');
 
-function mvp_admin_actions() {
-  add_options_page('MVP', 'Superdesk Publisher', 'manage_options', __FILE__, 'mvp_admin');
+function superdesk_admin_actions() {
+  add_options_page('SUPERDESK', 'Superdesk Publisher', 'manage_options', __FILE__, 'superdesk_admin');
 }
 
 function _plugin_action_links($links) {
@@ -14,14 +14,14 @@ function _plugin_action_links($links) {
 
 function get_page_url() {
 
-  $args = array('page' => 'mvp/admin/admin');
+  $args = array('page' => 'superdesk/admin/admin');
 
   $url = add_query_arg($args, admin_url('options-general.php'));
 
   return $url;
 }
 
-function mvp_admin() {
+function superdesk_admin() {
   if (isset($_POST['url'])) {
     $settings = array(
         'url' => $_POST['url'],
@@ -39,9 +39,9 @@ function mvp_admin() {
         'subject-type' => $_POST['subject-type'],
         'category' => $_POST['category'],
     );
-    update_option('mvp_settings', $settings);
-  } else if (get_option('mvp_settings')) {
-    $settings = get_option('mvp_settings');
+    update_option('superdesk_settings', $settings);
+  } else if (get_option('superdesk_settings')) {
+    $settings = get_option('superdesk_settings');
   } else {
     $settings = array(
         'url' => '',
@@ -90,7 +90,7 @@ function mvp_admin() {
         <tbody>
           <tr>
             <th>Autoload</th>
-            <td><?php echo get_site_url(); ?>/wp-content/plugins/mvp/autoload.php</td>
+            <td><?php echo get_site_url(); ?>/wp-content/plugins/superdesk-wordpress-plugin/autoload.php</td>
           </tr>
           <tr>
             <th scope="row">
