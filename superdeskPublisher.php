@@ -106,5 +106,22 @@ function saveAttachment($picture, $post_ID) {
   set_post_thumbnail($post_ID, $attach_id);
 }
 
+function custom_wpkses_post_tags($tags, $context) {
+  if ('post' === $context) {
+    $tags['iframe'] = array(
+        'src' => true,
+        'height' => true,
+        'width' => true,
+        'frameborder' => true,
+        'allowfullscreen' => true,
+    );
+  }
+  return $tags;
+}
+
+add_filter('wp_kses_allowed_html', 'custom_wpkses_post_tags', 10, 2);
+
+wp_oembed_add_provider('#http://(www\.)?youtube\.com/watch.*#i', 'http://www.youtube.com/oembed', true);
+
 register_activation_hook(__FILE__, 'mvp_database_install');
 add_action('plugins_loaded', 'mvp_database_update');
