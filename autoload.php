@@ -27,7 +27,7 @@ if ($obj['type'] == 'text') {
     }
 
     if ($settings['import-keywords'] && $settings['import-keywords'] == 'on') {
-      if(isset($obj['keywords']) && count($obj['keywords']) > 0) {
+      if (isset($obj['keywords']) && count($obj['keywords']) > 0) {
         foreach ($obj['keywords'] as $keyword) {
           $taxonomyTag[] = wp_strip_all_tags($keyword);
         }
@@ -68,6 +68,36 @@ if ($obj['type'] == 'text') {
       $category = $settings['category'];
     }
 
+    if ($settings['author-byline'] && $settings['author-byline'] == 'on') {
+      $author_name = $obj['byline'];
+      if (!empty(trim($settings['byline-words']))) {
+        $replaceWords = explode(',', $settings['byline-words']);
+        foreach ($replaceWords as $value) {
+          $author_name = str_replace(trim($value) . " ", "", $author_name);
+        }
+      }
+
+      $authorExist = $wpdb->get_row("SELECT ID user_id FROM " . $wpdb->prefix . DB_TABLE_USERS . " WHERE display_name = '" . wp_strip_all_tags($author_name) . "'");
+
+      if (!$authorExist) {
+        $table_name = $wpdb->prefix . DB_TABLE_USERS;
+
+        $userArray = array(
+            'user_login' => strtolower(str_replace(" ", "-", $author_name)),
+            'user_pass' => generatePassword(),
+            'display_name' => wp_strip_all_tags($author_name)
+        );
+
+        $author_id = wp_insert_user($userArray);
+      } else {
+        $author_id = $authorExist->user_id;
+      }
+    } elseif ($settings['author-byline'] == 'on') {
+      $author_id = $settings['author'];
+    } else {
+      $author_id = 0;
+    }
+
     $sync = $wpdb->get_row("SELECT post_id FROM " . $wpdb->prefix . DB_TABLE_SYNC_POST . " WHERE guid = '" . $guid . "'");
 
     if ($sync) {
@@ -77,6 +107,7 @@ if ($obj['type'] == 'text') {
           'post_title' => wp_strip_all_tags($obj['headline']),
           'post_name' => wp_strip_all_tags($obj['headline']),
           'post_content' => $content,
+          'post_author' => (int) $author_id,
           'post_content_filtered' => $content,
           'post_category' => $category
       );
@@ -101,41 +132,6 @@ if ($obj['type'] == 'text') {
               )
       );
     } else {
-
-      if ($settings['author-byline'] && $settings['author-byline'] == 'on') {
-        $author_name = $obj['byline'];
-        if (!empty(trim($settings['byline-words']))) {
-          $replaceWords = explode(',', $settings['byline-words']);
-          foreach ($replaceWords as $value) {
-            $author_name = str_replace(trim($value) . " ", "", $author_name);
-          }
-        }
-
-        $authorExist = $wpdb->get_row("SELECT ID user_id FROM " . $wpdb->prefix . DB_TABLE_USERS . " WHERE display_name = '" . wp_strip_all_tags($author_name) . "'");
-
-        if (!$authorExist) {
-          $table_name = $wpdb->prefix . DB_TABLE_USERS;
-
-          $userArray = array(
-              'user_login' => strtolower(str_replace(" ", "-", $author_name)),
-              'user_pass' => generatePassword(),
-              'display_name' => wp_strip_all_tags($author_name)
-          );
-
-          $author_id = wp_insert_user($userArray);
-        } else {
-          $author_id = $authorExist->user_id;
-        }
-      } elseif ($settings['author-byline'] == 'on') {
-        $author_id = $settings['author'];
-      } else {
-        $author_id = 0;
-      }
-
-      /* if ($settings['convert-keywords'] && $settings['convert-keywords'] == 'on') {
-
-        } */
-
       $postarr = array(
           'post_title' => wp_strip_all_tags($obj['headline']),
           'post_name' => wp_strip_all_tags($obj['headline']),
