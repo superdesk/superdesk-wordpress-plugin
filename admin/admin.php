@@ -3,6 +3,8 @@ add_action('admin_menu', 'superdesk_admin_actions');
 
 add_filter('plugin_action_links_superdesk/superdeskPublisher.php', '_plugin_action_links');
 
+//var_dump(get_post_format_strings());die();
+
 function superdesk_admin_actions() {
   add_options_page('SUPERDESK', 'Superdesk Publisher', 'manage_options', __FILE__, 'superdesk_admin');
 }
@@ -38,6 +40,9 @@ function superdesk_admin() {
         'convert-services' => $_POST['convert-services'],
         'subject-type' => $_POST['subject-type'],
         'category' => $_POST['category'],
+        'separator-caption-image' => $_POST['separator-caption-image'],
+        'copyrightholder-image' => $_POST['copyrightholder-image'],
+        'copyrightnotice-image' => $_POST['copyrightnotice-image'],
     );
     update_option('superdesk_settings', $settings);
   } else if (get_option('superdesk_settings')) {
@@ -58,6 +63,9 @@ function superdesk_admin() {
         'convert-services' => '',
         'subject-type' => '',
         'category' => '',
+        'separator-caption-image' => '',
+        'copyrightholder-image' => '',
+        'copyrightnotice-image' => '',
     );
   }
   $statuses = array(
@@ -317,6 +325,62 @@ function superdesk_admin() {
                         }
                         ?>
               </select>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <label for="separator-caption-image">Separator for caption image</label>
+            </th>
+            <td>
+              <input type="text" name="separator-caption-image" id="separator-caption-image" class="regular-text" value="<?php echo($settings['separator-caption-image']); ?>">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              Display the copyrightholder image
+            </th>
+            <td>
+              <fieldset>
+                <label for="copyrightholder-image-off">
+                  <input type="radio" name="copyrightholder-image" id="copyrightholder-image-off" value="off"<?php
+                  if ($settings['copyrightholder-image'] == 'off') {
+                    echo(' checked');
+                  }
+                  ?>> off
+                </label>
+                <br>
+                <label for="copyrightholder-image-on">
+                  <input type="radio" name="copyrightholder-image" id="copyrightholder-image-on" value="on"<?php
+                  if ($settings['copyrightholder-image'] == 'on') {
+                    echo(' checked');
+                  }
+                  ?>> on
+                </label>
+              </fieldset>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              Display the copyrightnotice image
+            </th>
+            <td>
+              <fieldset>
+                <label for="copyrightnotice-image-off">
+                  <input type="radio" name="copyrightnotice-image" id="copyrightnotice-image-off" value="off"<?php
+                  if ($settings['copyrightnotice-image'] == 'off') {
+                    echo(' checked');
+                  }
+                  ?>> off
+                </label>
+                <br>
+                <label for="copyrightnotice-image-on">
+                  <input type="radio" name="copyrightnotice-image" id="copyrightnotice-image-on" value="on"<?php
+                  if ($settings['copyrightnotice-image'] == 'on') {
+                    echo(' checked');
+                  }
+                  ?>> on
+                </label>
+              </fieldset>
             </td>
           </tr>
         </tbody>

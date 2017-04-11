@@ -11,7 +11,7 @@ $obj = json_decode($json, true);
 
 if ($obj['type'] == 'text') {
 
-  $settings = get_option('mvp_settings');
+  $settings = get_option('superdesk_settings');
 
   if ($obj['pubstatus'] == 'usable') {
     $content = $obj['description_html'] . "<!--more-->" . $obj['body_html'];
@@ -169,7 +169,9 @@ if ($obj['type'] == 'text') {
       if ($fileExist) {
         set_post_thumbnail($post_ID, $fileExist->post_id);
       } else {
-        saveAttachment($obj['associations']['featuremedia'], $post_ID);
+        $caption = generate_caption_image($obj['associations']['featuremedia']);
+        $alt = (!empty($obj['associations']['featuremedia']['body_text'])) ? wp_strip_all_tags($obj['associations']['featuremedia']['body_text']) : '';
+        saveAttachment($obj['associations']['featuremedia'], $post_ID, $caption, $alt);
       }
     }
   } elseif ($obj['pubstatus'] == 'canceled') {

@@ -82,7 +82,7 @@ function generatePassword() {
   return $password;
 }
 
-function saveAttachment($picture, $post_ID) {
+function saveAttachment($picture, $post_ID, $caption, $alt) {
   $filenameQ = explode("/", $picture['renditions']['original']['media']);
   $filename = $filenameQ[count($filenameQ) - 1];
 
@@ -91,8 +91,9 @@ function saveAttachment($picture, $post_ID) {
   $attachment = array(
       'guid' => wp_upload_dir()['url'] . '/' . basename($filename),
       'post_mime_type' => $picture['mimetype'],
-      'post_title' => preg_replace('/\.[^.]+$/', '', basename($picture['headline'])),
+      'post_title' => $caption,
       'post_content' => '',
+      'post_excerpt' => $caption,
       'post_status' => 'inherit'
   );
 
@@ -104,6 +105,8 @@ function saveAttachment($picture, $post_ID) {
 
   wp_update_attachment_metadata($attach_id, $attach_data);
   set_post_thumbnail($post_ID, $attach_id);
+
+  update_post_meta($attach_id, '_wp_attachment_image_alt', wp_slash($alt));
 }
 
 function custom_wpkses_post_tags($tags, $context) {
@@ -117,6 +120,32 @@ function custom_wpkses_post_tags($tags, $context) {
     );
   }
   return $tags;
+}
+
+function generate_caption_image($media) {
+  $caption = '';
+  $settings = get_option('superdesk_settings');
+  if (!empty(trim($media['description_text']))) {
+    $caption.= wp_strip_all_tags($media['description_text']);
+  }
+
+  if (!empty(trim($media['byline']))) {
+    if (!empty($caption)) {
+      $caption.=' ';
+    }
+
+    $caption.= $settings['separator-caption-image'] . ': ' . wp_strip_all_tags($media['byline']);
+  }
+
+  if (!empty(trim($media['copyrightholder'])) && $settings['copyrightholder-image'] == 'on') {
+    $caption.= ' / ' . wp_strip_all_tags($media['copyrightholder']);
+  }
+
+  if (!empty(trim($media['copyrightnotice'])) && $settings['copyrightnotice-image'] == 'on') {
+    $caption.= ' ' . wp_strip_all_tags($media['copyrightnotice']);
+  }
+
+  return $caption;
 }
 
 add_filter('wp_kses_allowed_html', 'custom_wpkses_post_tags', 10, 2);
