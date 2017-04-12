@@ -26,6 +26,10 @@ if ($obj['type'] == 'text') {
       $content.= "<p>" . wp_strip_all_tags($obj['associations']['featuremedia']['copyrightnotice']) . "</p>";
     }
 
+    if (!empty($obj['ednote'])) {
+      $content.= "<p>Editors Note: " . wp_strip_all_tags($obj['ednote']) . "</p>";
+    }
+
     if (isset($obj['evolvedfrom'])) {
       $guid = wp_strip_all_tags($obj['evolvedfrom']);
     } else {
