@@ -325,8 +325,10 @@ function superdesk_admin() {
                 foreach ($categories as $key => $value) {
                   ?>
                   <option value="<?php echo($key); ?>"<?php
-                  if (in_array($key, $settings['category'])) {
-                    echo(' selected');
+                  if (isset($settings['category']) && is_array($settings['category'])) {
+                    if (in_array($key, $settings['category'])) {
+                      echo(' selected');
+                    }
                   }
                   ?>><?php echo($value); ?></option>
                           <?php
