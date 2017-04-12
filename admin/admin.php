@@ -43,6 +43,7 @@ function superdesk_admin() {
         'separator-caption-image' => $_POST['separator-caption-image'],
         'copyrightholder-image' => $_POST['copyrightholder-image'],
         'copyrightnotice-image' => $_POST['copyrightnotice-image'],
+        'separator-located' => $_POST['separator-located'],
     );
     update_option('superdesk_settings', $settings);
   } else if (get_option('superdesk_settings')) {
@@ -66,6 +67,7 @@ function superdesk_admin() {
         'separator-caption-image' => '',
         'copyrightholder-image' => '',
         'copyrightnotice-image' => '',
+        'separator-located' => '',
     );
   }
   $statuses = array(
@@ -381,6 +383,14 @@ function superdesk_admin() {
                   ?>> on
                 </label>
               </fieldset>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <label for="separator-located">Separator between the location and name</label>
+            </th>
+            <td>
+              <input type="text" name="separator-located" id="separator-located" class="regular-text" value="<?php echo($settings['separator-located']); ?>">
             </td>
           </tr>
         </tbody>

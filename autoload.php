@@ -16,6 +16,12 @@ if ($obj['type'] == 'text') {
   if ($obj['pubstatus'] == 'usable') {
     $content = $obj['description_html'] . "<!--more-->" . $obj['body_html'];
 
+    if (!empty($obj['located'])) {
+      $content = substr($obj['description_html'], strpos($obj['description_html'], '>') + 1, strlen($obj['description_html'])) . "<!--more-->" . $obj['body_html'];
+
+      $content = '<p>' . wp_strip_all_tags($obj['located']) . $settings['separator-located'] . $content;
+    }
+
     if ($settings['display-copyright'] == "on" && isset($obj['associations']['featuremedia']['copyrightnotice'])) {
       $content.= "<p>" . wp_strip_all_tags($obj['associations']['featuremedia']['copyrightnotice']) . "</p>";
     }
