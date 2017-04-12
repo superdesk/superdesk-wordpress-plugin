@@ -40,6 +40,19 @@ if ($obj['type'] == 'text') {
       }
     }
 
+    if ($settings['convert-slugline'] && $settings['convert-slugline'] == 'on') {
+      if (isset($obj['slugline']) && !empty($obj['slugline'])) {
+        $ignoreKeywords = explode(',', $settings['slugline-ignored']);
+        $tmpKeywords = explode($settings['slugline-separator'], $obj['slugline']);
+
+        foreach ($tmpKeywords as $word) {
+          if (!in_array($word, $ignoreKeywords)) {
+            $taxonomyTag[] = $word;
+          }
+        }
+      }
+    }
+
     foreach ($obj['subject'] as $subject) {
       if ($settings['subject-type'] == 'tags') {
         $taxonomyTag[] = wp_strip_all_tags($subject['name']);

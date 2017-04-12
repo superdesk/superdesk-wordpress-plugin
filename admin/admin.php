@@ -44,6 +44,9 @@ function superdesk_admin() {
         'copyrightholder-image' => $_POST['copyrightholder-image'],
         'copyrightnotice-image' => $_POST['copyrightnotice-image'],
         'separator-located' => $_POST['separator-located'],
+        'convert-slugline' => $_POST['convert-slugline'],
+        'slugline-separator' => $_POST['slugline-separator'],
+        'slugline-ignored' => $_POST['slugline-ignored'],
     );
     update_option('superdesk_settings', $settings);
   } else if (get_option('superdesk_settings')) {
@@ -68,6 +71,9 @@ function superdesk_admin() {
         'copyrightholder-image' => '',
         'copyrightnotice-image' => '',
         'separator-located' => '',
+        'convert-slugline' => '',
+        'slugline-separator' => '',
+        'slugline-ignored' => '',
     );
   }
   $statuses = array(
@@ -391,6 +397,46 @@ function superdesk_admin() {
             </th>
             <td>
               <input type="text" name="separator-located" id="separator-located" class="regular-text" value="<?php echo($settings['separator-located']); ?>">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              Convert slugline keywords into WP tags
+            </th>
+            <td>
+              <fieldset>
+                <label for="convert-slugline-off">
+                  <input type="radio" name="convert-slugline" id="convert-slugline-off" value="off"<?php
+                  if ($settings['convert-slugline'] == 'off') {
+                    echo(' checked');
+                  }
+                  ?>> off
+                </label>
+                <br>
+                <label for="convert-slugline-on">
+                  <input type="radio" name="convert-slugline" id="convert-slugline-on" value="on"<?php
+                  if ($settings['convert-slugline'] == 'on') {
+                    echo(' checked');
+                  }
+                  ?>> on
+                </label>
+              </fieldset>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <label for="slugline-separator">Slugline value separator</label>
+            </th>
+            <td>
+              <input type="text" name="slugline-separator" id="slugline-separator" class="regular-text" value="<?php echo($settings['slugline-separator']); ?>">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <label for="slugline-ignored">Keywords to be ignored</label>
+            </th>
+            <td>
+              <input type="text" name="slugline-ignored" id="slugline-ignored" class="regular-text" value="<?php echo($settings['slugline-ignored']); ?>">
             </td>
           </tr>
         </tbody>
