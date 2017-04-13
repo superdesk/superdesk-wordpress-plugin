@@ -197,7 +197,7 @@ function superdesk_admin() {
           </tr>
           <tr>
             <th scope="row">
-              Display the copyright information
+              Choose words to replace from the byline
             </th>
             <td>
               <fieldset>

@@ -22,9 +22,9 @@ if ($obj['type'] == 'text') {
       $content = '<p>' . wp_strip_all_tags($obj['located']) . $settings['separator-located'] . $content;
     }
 
-    if ($settings['display-copyright'] == "on" && isset($obj['associations']['featuremedia']['copyrightnotice'])) {
+    /*if ($settings['display-copyright'] == "on" && isset($obj['associations']['featuremedia']['copyrightnotice'])) {
       $content.= "<p>" . wp_strip_all_tags($obj['associations']['featuremedia']['copyrightnotice']) . "</p>";
-    }
+    }*/
 
     if (!empty($obj['ednote'])) {
       $content.= "<p>Editors Note: " . wp_strip_all_tags($obj['ednote']) . "</p>";
