@@ -22,9 +22,9 @@ if ($obj['type'] == 'text') {
       $content = '<p>' . wp_strip_all_tags($obj['located']) . $settings['separator-located'] . $content;
     }
 
-    /*if ($settings['display-copyright'] == "on" && isset($obj['associations']['featuremedia']['copyrightnotice'])) {
+    /* if ($settings['display-copyright'] == "on" && isset($obj['associations']['featuremedia']['copyrightnotice'])) {
       $content.= "<p>" . wp_strip_all_tags($obj['associations']['featuremedia']['copyrightnotice']) . "</p>";
-    }*/
+      } */
 
     if (!empty($obj['ednote'])) {
       $content.= "<p>Editors Note: " . wp_strip_all_tags($obj['ednote']) . "</p>";
@@ -154,6 +154,12 @@ if ($obj['type'] == 'text') {
           'time' => current_time('mysql')
               )
       );
+
+      if ($settings['priority_threshhold'] && $settings['priority_threshhold'] >= $obj['priority']) {
+        stick_post($post_ID);
+      } else {
+        unstick_post($post_ID);
+      }
     } else {
       $postarr = array(
           'post_title' => wp_strip_all_tags($obj['headline']),
@@ -180,6 +186,10 @@ if ($obj['type'] == 'text') {
           'time' => current_time('mysql')
               )
       );
+
+      if ($settings['priority_threshhold'] && $settings['priority_threshhold'] >= $obj['priority']) {
+        stick_post($post_ID);
+      }
     }
 
     /* save featured media */

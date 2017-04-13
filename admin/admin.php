@@ -47,6 +47,7 @@ function superdesk_admin() {
         'convert-slugline' => $_POST['convert-slugline'],
         'slugline-separator' => $_POST['slugline-separator'],
         'slugline-ignored' => $_POST['slugline-ignored'],
+        'priority_threshhold' => $_POST['priority_threshhold'],
     );
     update_option('superdesk_settings', $settings);
   } else if (get_option('superdesk_settings')) {
@@ -74,6 +75,7 @@ function superdesk_admin() {
         'convert-slugline' => '',
         'slugline-separator' => '',
         'slugline-ignored' => '',
+        'priority_threshhold' => '',
     );
   }
   $statuses = array(
@@ -439,6 +441,27 @@ function superdesk_admin() {
             </th>
             <td>
               <input type="text" name="slugline-ignored" id="slugline-ignored" class="regular-text" value="<?php echo($settings['slugline-ignored']); ?>">
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+              <label for="priority_threshhold">Priority threshhold of </label>
+            </th>
+            <td>
+              <select name="priority_threshhold" id="priority_threshhold">
+                <option value="0"> </option>
+                <?php
+                for ($i = 1; $i <= 6; $i++) {
+                  ?>
+                  <option value="<?php echo($i); ?>"<?php
+                  if (isset($settings['priority_threshhold']) && $settings['priority_threshhold'] == $i) {
+                    echo(' selected');
+                  }
+                  ?>><?php echo($i); ?></option>
+                          <?php
+                        }
+                        ?>
+              </select>
             </td>
           </tr>
         </tbody>
