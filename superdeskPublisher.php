@@ -148,6 +148,53 @@ function generate_caption_image($media) {
   return $caption;
 }
 
+function embed_src($src) {
+  $filename = sha1($src);
+  
+  saveFile($src, wp_upload_dir()['path'] . "/" . $filename);
+  return wp_upload_dir()['url'] . "/" . $filename;
+}
+
+function embed_images($html) {
+  $result = array();
+  preg_match_all('/<img[^>]+>/i', $html, $result);
+  if (count($result) > 0) {
+    $img = array();
+    foreach ($result as $row) {
+      if (count($row) > 0) {
+        foreach ($row as $img_tag) {
+          preg_match_all('/(src|title|alt)=("[^"]*")/i', $img_tag, $img[$img_tag]);
+        }
+      }
+    }
+
+    if (count($img) > 0) {
+      foreach ($img as $htmlTag => $src) {
+        $attrs = array();
+        if (isset($src[1], $src[2])) {
+          foreach ($src[1] as $key => $attr) {
+            $value = $src[2][$key];
+            if ($attr === "src") {
+              $value = mb_substr($value, 1, mb_strlen($value) - 2);
+              $value = '"' . embed_src($value) . '"';
+            }
+
+            $attrs[$attr] = $value;
+          }
+          $newHtmlTag = "<img";
+          foreach ($attrs as $attrName => $attrValue) {
+            $newHtmlTag .= " " . $attrName . "=" . $attrValue;
+          }
+          $newHtmlTag .= ">";
+          $html = str_replace($htmlTag, $newHtmlTag, $html);
+        }
+      }
+    }
+  }
+
+  return $html;
+}
+
 add_filter('wp_kses_allowed_html', 'custom_wpkses_post_tags', 10, 2);
 
 wp_oembed_add_provider('#http://(www\.)?youtube\.com/watch.*#i', 'http://www.youtube.com/oembed', true);

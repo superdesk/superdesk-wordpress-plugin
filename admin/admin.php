@@ -48,6 +48,7 @@ function superdesk_admin() {
         'slugline-separator' => $_POST['slugline-separator'],
         'slugline-ignored' => $_POST['slugline-ignored'],
         'priority_threshhold' => $_POST['priority_threshhold'],
+        'download-images' => $_POST['download-images'],
     );
     update_option('superdesk_settings', $settings);
   } else if (get_option('superdesk_settings')) {
@@ -76,6 +77,7 @@ function superdesk_admin() {
         'slugline-separator' => '',
         'slugline-ignored' => '',
         'priority_threshhold' => '',
+        'download-images' => '',
     );
   }
   $statuses = array(
@@ -462,6 +464,30 @@ function superdesk_admin() {
                         }
                         ?>
               </select>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">
+               Download images from SD
+            </th>
+            <td>
+              <fieldset>
+                <label for="download-images-off">
+                  <input type="radio" name="download-images" id="download-images-off" value="off"<?php
+                  if ($settings['download-images'] == 'off') {
+                    echo(' checked');
+                  }
+                  ?>> off
+                </label>
+                <br>
+                <label for="download-images-on">
+                  <input type="radio" name="download-images" id="download-images-on" value="on"<?php
+                  if ($settings['download-images'] == 'on') {
+                    echo(' checked');
+                  }
+                  ?>> on
+                </label>
+              </fieldset>
             </td>
           </tr>
         </tbody>

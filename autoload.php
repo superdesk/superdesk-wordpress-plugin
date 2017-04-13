@@ -121,6 +121,10 @@ if ($obj['type'] == 'text') {
       $author_id = 0;
     }
 
+    if ($settings['download-images'] && $settings['download-images'] == 'on') {
+      $content = embed_images($content);
+    }
+
     $sync = $wpdb->get_row("SELECT post_id FROM " . $wpdb->prefix . DB_TABLE_SYNC_POST . " WHERE guid = '" . $guid . "'");
 
     if ($sync) {
