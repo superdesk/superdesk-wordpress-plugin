@@ -27,7 +27,7 @@ if ($obj['type'] == 'text') {
       } */
 
     if (!empty($obj['ednote'])) {
-      $content.= "<p>Editors Note: " . wp_strip_all_tags($obj['ednote']) . "</p>";
+      $content .= "<p>Editors Note: " . wp_strip_all_tags($obj['ednote']) . "</p>";
     }
 
     if (isset($obj['evolvedfrom'])) {
@@ -139,6 +139,12 @@ if ($obj['type'] == 'text') {
           'post_category' => $category
       );
 
+      if (isset($settings['post-formats'], $settings['post-formats-table']) and ! empty($obj['profile']) and $settings['post-formats'] == 'on') {
+        if (isset($settings['post-formats-table'][$obj['profile']])) {
+          set_post_format($post_ID, $settings['post-formats-table'][$obj['profile']]);
+        }
+      }
+
       wp_update_post($edit_post);
 
       $attachmentExist = get_post_thumbnail_id($post_ID);
@@ -176,6 +182,12 @@ if ($obj['type'] == 'text') {
       );
 
       $post_ID = wp_insert_post($postarr, true);
+
+      if (isset($settings['post-formats'], $settings['post-formats-table']) and ! empty($obj['profile']) and $settings['post-formats'] == 'on') {
+        if (isset($settings['post-formats-table'][$obj['profile']])) {
+          set_post_format($post_ID, $settings['post-formats-table'][$obj['profile']]);
+        }
+      }
 
       if ($taxonomyTag && !empty($taxonomyTag)) {
         wp_set_post_tags($post_ID, $taxonomyTag);
