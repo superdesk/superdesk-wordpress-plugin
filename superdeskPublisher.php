@@ -158,6 +158,7 @@ function savePicture($localPath, $postId, $oldSrc, $associations) {
 function custom_wpkses_post_tags($tags, $context) {
   if ('post' === $context) {
     $tags['iframe'] = array(
+        'style' => true,
         'src' => true,
         'height' => true,
         'width' => true,
