@@ -14,12 +14,12 @@ if ($obj['type'] == 'text') {
   $settings = get_option('superdesk_settings');
 
   if ($obj['pubstatus'] == 'usable') {
-    $content = $obj['description_html'] . "<!--more-->" . $obj['body_html'];
-
     if (!empty($obj['located'])) {
-      $content = substr($obj['description_html'], strpos($obj['description_html'], '>') + 1, strlen($obj['description_html'])) . "<!--more-->" . $obj['body_html'];
-
-      $content = '<p>' . wp_strip_all_tags($obj['located']) . $settings['separator-located'] . $content;
+      $content = $obj['description_html'] . "<!--more-->";
+      $content .= '<p>' . wp_strip_all_tags($obj['located']) . $settings['separator-located'];
+      $content .= mb_substr($obj['body_html'], mb_strpos($obj['body_html'], '>') + 1, mb_strlen($obj['body_html']));
+    } else {
+      $content = $obj['description_html'] . "<!--more-->" . $obj['body_html'];
     }
 
     /* if ($settings['display-copyright'] == "on" && isset($obj['associations']['featuremedia']['copyrightnotice'])) {
@@ -121,8 +121,9 @@ if ($obj['type'] == 'text') {
       $author_id = 0;
     }
 
-    if ($settings['download-images'] && $settings['download-images'] == 'on') {
-      $content = embed_images($content);
+    $image = null;
+    if (isset($settings['download-images']) && $settings['download-images'] === 'on') {
+      $content = embed_images($content, $image);
     }
 
     $sync = $wpdb->get_row("SELECT post_id FROM " . $wpdb->prefix . DB_TABLE_SYNC_POST . " WHERE guid = '" . $guid . "'");
@@ -221,6 +222,17 @@ if ($obj['type'] == 'text') {
         $caption = generate_caption_image($obj['associations']['featuremedia']);
         $alt = (!empty($obj['associations']['featuremedia']['body_text'])) ? wp_strip_all_tags($obj['associations']['featuremedia']['body_text']) : '';
         saveAttachment($obj['associations']['featuremedia'], $post_ID, $caption, $alt);
+      }
+    } else if ($image !== null) {
+      $filenameQ = explode("/", $image->src);
+      $filename = $filenameQ[count($filenameQ) - 1];
+
+      $fileExist = $wpdb->get_row("SELECT meta_id, post_id FROM " . $wpdb->prefix . "postmeta WHERE meta_key = '_wp_attached_file' AND meta_value LIKE '%" . wp_strip_all_tags($filename) . "'");
+
+      if ($fileExist) {
+        set_post_thumbnail($post_ID, $fileExist->post_id);
+      } else {
+        savePicture($image->src, $post_ID, $image->oldSrc, $obj['associations']);
       }
     }
   } elseif ($obj['pubstatus'] == 'canceled') {

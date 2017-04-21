@@ -109,6 +109,52 @@ function saveAttachment($picture, $post_ID, $caption, $alt) {
   update_post_meta($attach_id, '_wp_attachment_image_alt', wp_slash($alt));
 }
 
+function savePicture($localPath, $postId, $oldSrc, $associations) {
+  $filenameQ = explode("/", $localPath);
+  $filename = $filenameQ[count($filenameQ) - 1];
+
+  $name = null;
+  $mimeType = null;
+  foreach ($associations as $key => $value) {
+    var_dump($value);
+    if (isset($value['renditions'])) {
+      foreach ($value['renditions'] as $value2) {
+        if ($value2['href'] === $oldSrc) {
+          $name = $key;
+          $mimeType = $value2['mimetype'];
+          break 2;
+        }
+      }
+    }
+  }
+  if ($name == null)
+    return;
+
+  $caption = generate_caption_image($associations[$name]);
+  $alt = (!empty($associations[$name]['body_text'])) ? wp_strip_all_tags($associations[$name]['body_text']) : '';
+
+  $attachment = array(
+      'guid' => $localPath,
+      'post_mime_type' => $mimeType,
+      'post_title' => $caption,
+      'post_content' => '',
+      'post_excerpt' => $caption,
+      'post_status' => 'inherit'
+  );
+
+
+  $attach_id = wp_insert_attachment($attachment, date("Y") . "/" . date("m") . "/" . $filename, $postId);
+
+  require_once( ABSPATH . 'wp-admin/includes/image.php' );
+
+  $attach_data = wp_generate_attachment_metadata($attach_id, wp_upload_dir()['path'] . "/" . $filename);
+
+  wp_update_attachment_metadata($attach_id, $attach_data);
+  set_post_thumbnail($postId, $attach_id);
+
+  update_post_meta($attach_id, '_wp_attachment_image_alt', wp_slash($alt));
+}
+
 function custom_wpkses_post_tags($tags, $context) {
   if ('post' === $context) {
     $tags['iframe'] = array(
@@ -126,23 +172,23 @@ function generate_caption_image($media) {
   $caption = '';
   $settings = get_option('superdesk_settings');
   if (!empty(trim($media['description_text']))) {
-    $caption.= wp_strip_all_tags($media['description_text']);
+    $caption .= wp_strip_all_tags($media['description_text']);
   }
 
   if (!empty(trim($media['byline']))) {
     if (!empty($caption)) {
-      $caption.=' ';
+      $caption .= ' ';
     }
 
-    $caption.= $settings['separator-caption-image'] . ': ' . wp_strip_all_tags($media['byline']);
+    $caption .= (empty($settings['separator-caption-image']) ? ':' : $settings['separator-caption-image']) . ' ' . wp_strip_all_tags($media['byline']);
   }
 
   if (!empty(trim($media['copyrightholder'])) && $settings['copyrightholder-image'] == 'on') {
-    $caption.= ' / ' . wp_strip_all_tags($media['copyrightholder']);
+    $caption .= ' / ' . wp_strip_all_tags($media['copyrightholder']);
   }
 
   if (!empty(trim($media['copyrightnotice'])) && $settings['copyrightnotice-image'] == 'on') {
-    $caption.= ' ' . wp_strip_all_tags($media['copyrightnotice']);
+    $caption .= ' ' . wp_strip_all_tags($media['copyrightnotice']);
   }
 
   return $caption;
@@ -150,12 +196,28 @@ function generate_caption_image($media) {
 
 function embed_src($src) {
   $filename = sha1($src);
-  
+
   saveFile($src, wp_upload_dir()['path'] . "/" . $filename);
   return wp_upload_dir()['url'] . "/" . $filename;
 }
 
-function embed_images($html) {
+class Image {
+
+  public $src, $oldSrc;
+
+  public function __construct(array $attrs, $oldSrc) {
+    $this->src = $attrs['src'];
+    $this->oldSrc = $oldSrc;
+    stripQuotes($this->src);
+  }
+
+}
+
+function stripQuotes(&$value) {
+  $value = mb_substr($value, 1, mb_strlen($value) - 2);
+}
+
+function embed_images($html, &$image) {
   $result = array();
   preg_match_all('/<img[^>]+>/i', $html, $result);
   if (count($result) > 0) {
@@ -172,15 +234,22 @@ function embed_images($html) {
       foreach ($img as $htmlTag => $src) {
         $attrs = array();
         if (isset($src[1], $src[2])) {
+          $oldSrc = '';
           foreach ($src[1] as $key => $attr) {
             $value = $src[2][$key];
             if ($attr === "src") {
-              $value = mb_substr($value, 1, mb_strlen($value) - 2);
+              stripQuotes($value);
+              $oldSrc = $value;
               $value = '"' . embed_src($value) . '"';
             }
 
             $attrs[$attr] = $value;
           }
+
+          if ($image === null) {
+            $image = new Image($attrs, $oldSrc);
+          }
+
           $newHtmlTag = "<img";
           foreach ($attrs as $attrName => $attrValue) {
             $newHtmlTag .= " " . $attrName . "=" . $attrValue;
