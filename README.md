@@ -13,7 +13,10 @@ On the Superdesk side, there are publishing providers which are the ones in char
 
 Stories are checked in Superdesk as published, then the publishing providers take over to distribute the content.
 
-The Superdesk Wordpress Publisher plugin currently uses Superdesk's HTTP PUSH to receive content in ninjs. (This is likely to change in future versions.)
+The Superdesk Wordpress Publisher plugin currently uses Superdesk's HTTP PUSH to receive content in ninjs. When the plugin receives new content via HTTP PUSH, it automatically loads this content into the Wordpress database via the REST API.
+
+# Settings menu
+A settings menu in Wordpress lets you customize the way Wordpress handles content from Superdesk. For example, you can map Superdesk's categories to Wordpress's tags, or use Superdesk subjects as categories. Authors, copyright information, post status, and default categories are just some of the Wordpress fields that can be controlled from the Settings menu.
 
 # What's next?
 We do not have a native Wordpress publishing provider in Superdesk, and there is no plan to write one in the current roadmap. We prefer to use ninjs as an standard interchange format.
