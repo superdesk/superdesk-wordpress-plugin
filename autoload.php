@@ -232,7 +232,7 @@ if ($obj['type'] == 'text') {
       if ($fileExist) {
         set_post_thumbnail($post_ID, $fileExist->post_id);
       } else {
-        savePicture($image->src, $post_ID, $image->oldSrc, $obj['associations']);
+        savePicture($image->src, $post_ID, $image->oldSrc, isset($obj['associations']) ? $obj['associations'] : array(), $image->alt);
       }
     }
   } elseif ($obj['pubstatus'] == 'canceled') {

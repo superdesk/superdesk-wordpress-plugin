@@ -109,14 +109,13 @@ function saveAttachment($picture, $post_ID, $caption, $alt) {
   update_post_meta($attach_id, '_wp_attachment_image_alt', wp_slash($alt));
 }
 
-function savePicture($localPath, $postId, $oldSrc, $associations) {
+function savePicture($localPath, $postId, $oldSrc, $associations, $alt) {
   $filenameQ = explode("/", $localPath);
   $filename = $filenameQ[count($filenameQ) - 1];
 
   $name = null;
   $mimeType = null;
   foreach ($associations as $key => $value) {
-    var_dump($value);
     if (isset($value['renditions'])) {
       foreach ($value['renditions'] as $value2) {
         if ($value2['href'] === $oldSrc) {
@@ -127,15 +126,16 @@ function savePicture($localPath, $postId, $oldSrc, $associations) {
       }
     }
   }
-  if ($name == null)
-    return;
-
-  $caption = generate_caption_image($associations[$name]);
-  $alt = (!empty($associations[$name]['body_text'])) ? wp_strip_all_tags($associations[$name]['body_text']) : '';
-
+  if ($name == null) {
+    $caption = wp_strip_all_tags($alt);
+    $alt = wp_strip_all_tags($alt);
+  } else {
+    $caption = generate_caption_image($associations[$name]);
+    $alt = (!empty($associations[$name]['body_text'])) ? wp_strip_all_tags($associations[$name]['body_text']) : '';
+  }
   $attachment = array(
       'guid' => $localPath,
-      'post_mime_type' => $mimeType,
+      'post_mime_type' => $mimeType == null ? mime_content_type(wp_upload_dir()['path'] . "/" . $filename) : $mimeType,
       'post_title' => $caption,
       'post_content' => '',
       'post_excerpt' => $caption,
@@ -204,12 +204,14 @@ function embed_src($src) {
 
 class Image {
 
-  public $src, $oldSrc;
+  public $src, $alt, $oldSrc;
 
   public function __construct(array $attrs, $oldSrc) {
     $this->src = $attrs['src'];
+    $this->alt = isset($attrs['alt']) ? $attrs['alt'] : '';
     $this->oldSrc = $oldSrc;
     stripQuotes($this->src);
+    stripQuotes($this->alt);
   }
 
 }
@@ -247,7 +249,7 @@ function embed_images($html, &$image) {
             $attrs[$attr] = $value;
           }
 
-          if ($image === null) {
+          if ($image == null) {
             $image = new Image($attrs, $oldSrc);
           }
 
