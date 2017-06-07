@@ -3,9 +3,9 @@
 /**
  * Plugin Name: Superdesk Publisher
  * Plugin URI: 
- * Description: Nacitani clanku
- * Version: 0.1
- * Author: AdminIT
+ * Description: Imports articles in the IPTC ninjs format from the Superdesk newsroom system
+ * Version: 0.9
+ * Author: Sourcefabric and AdminIT
  */
 if (!function_exists('add_action')) {
   echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
