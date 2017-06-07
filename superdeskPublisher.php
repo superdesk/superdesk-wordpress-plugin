@@ -86,10 +86,11 @@ function saveAttachment($picture, $post_ID, $caption, $alt) {
   $filenameQ = explode("/", $picture['renditions']['original']['media']);
   $filename = $filenameQ[count($filenameQ) - 1];
 
-  saveFile($picture['renditions']['original']['href'], wp_upload_dir()['path'] . "/" . $filename);
+  $uploadDir = wp_upload_dir();
+  saveFile($picture['renditions']['original']['href'], $uploadDir['path'] . "/" . $filename);
 
   $attachment = array(
-      'guid' => wp_upload_dir()['url'] . '/' . basename($filename),
+      'guid' => $uploadDir['url'] . '/' . basename($filename),
       'post_mime_type' => $picture['mimetype'],
       'post_title' => $caption,
       'post_content' => '',
@@ -101,7 +102,7 @@ function saveAttachment($picture, $post_ID, $caption, $alt) {
 
   require_once( ABSPATH . 'wp-admin/includes/image.php' );
 
-  $attach_data = wp_generate_attachment_metadata($attach_id, wp_upload_dir()['path'] . "/" . $filename);
+  $attach_data = wp_generate_attachment_metadata($attach_id, $uploadDir['path'] . "/" . $filename);
 
   wp_update_attachment_metadata($attach_id, $attach_data);
   set_post_thumbnail($post_ID, $attach_id);
@@ -112,6 +113,7 @@ function saveAttachment($picture, $post_ID, $caption, $alt) {
 function savePicture($localPath, $postId, $oldSrc, $associations, $alt) {
   $filenameQ = explode("/", $localPath);
   $filename = $filenameQ[count($filenameQ) - 1];
+  $uploadDir = wp_upload_dir();
 
   $name = null;
   $mimeType = null;
@@ -135,7 +137,7 @@ function savePicture($localPath, $postId, $oldSrc, $associations, $alt) {
   }
   $attachment = array(
       'guid' => $localPath,
-      'post_mime_type' => $mimeType == null ? mime_content_type(wp_upload_dir()['path'] . "/" . $filename) : $mimeType,
+      'post_mime_type' => $mimeType == null ? mime_content_type($uploadDir['path'] . "/" . $filename) : $mimeType,
       'post_title' => $caption,
       'post_content' => '',
       'post_excerpt' => $caption,
@@ -147,7 +149,7 @@ function savePicture($localPath, $postId, $oldSrc, $associations, $alt) {
 
   require_once( ABSPATH . 'wp-admin/includes/image.php' );
 
-  $attach_data = wp_generate_attachment_metadata($attach_id, wp_upload_dir()['path'] . "/" . $filename);
+  $attach_data = wp_generate_attachment_metadata($attach_id, $uploadDir['path'] . "/" . $filename);
 
   wp_update_attachment_metadata($attach_id, $attach_data);
   set_post_thumbnail($postId, $attach_id);
@@ -196,10 +198,11 @@ function generate_caption_image($media) {
 }
 
 function embed_src($src) {
+  $uploadDir = wp_upload_dir();
   $filename = sha1($src);
 
-  saveFile($src, wp_upload_dir()['path'] . "/" . $filename);
-  return wp_upload_dir()['url'] . "/" . $filename;
+  saveFile($src, $uploadDir['path'] . "/" . $filename);
+  return $uploadDir['url'] . "/" . $filename;
 }
 
 class Image {
