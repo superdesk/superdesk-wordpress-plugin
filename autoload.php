@@ -93,7 +93,7 @@ if ($obj['type'] == 'text') {
 
     if ($settings['author-byline'] && $settings['author-byline'] == 'on') {
       $author_name = $obj['byline'];
-      if (!empty(trim($settings['byline-words']))) {
+      if (!empty($settings['byline-words'])) {
         $replaceWords = explode(',', $settings['byline-words']);
         foreach ($replaceWords as $value) {
           $author_name = str_replace(trim($value) . " ", "", $author_name);

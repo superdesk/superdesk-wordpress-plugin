@@ -174,11 +174,11 @@ function custom_wpkses_post_tags($tags, $context) {
 function generate_caption_image($media) {
   $caption = '';
   $settings = get_option('superdesk_settings');
-  if (!empty(trim($media['description_text']))) {
+  if (!empty($media['description_text'])) {
     $caption .= wp_strip_all_tags($media['description_text']);
   }
 
-  if (!empty(trim($media['byline']))) {
+  if (!empty($media['byline'])) {
     if (!empty($caption)) {
       $caption .= ' ';
     }
@@ -186,11 +186,11 @@ function generate_caption_image($media) {
     $caption .= (empty($settings['separator-caption-image']) ? ':' : $settings['separator-caption-image']) . ' ' . wp_strip_all_tags($media['byline']);
   }
 
-  if (!empty(trim($media['copyrightholder'])) && $settings['copyrightholder-image'] == 'on') {
+  if (!empty($media['copyrightholder']) && $settings['copyrightholder-image'] == 'on') {
     $caption .= ' / ' . wp_strip_all_tags($media['copyrightholder']);
   }
 
-  if (!empty(trim($media['copyrightnotice'])) && $settings['copyrightnotice-image'] == 'on') {
+  if (!empty($media['copyrightnotice']) && $settings['copyrightnotice-image'] == 'on') {
     $caption .= ' ' . wp_strip_all_tags($media['copyrightnotice']);
   }
 
