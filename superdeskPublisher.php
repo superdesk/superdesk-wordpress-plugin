@@ -4,7 +4,7 @@
  * Plugin Name: Superdesk Publisher
  * Plugin URI: 
  * Description: Imports articles in the IPTC ninjs format from the Superdesk newsroom system
- * Version: 0.9.1
+ * Version: 0.9.2
  * Author: Sourcefabric and AdminIT
  */
 if (!function_exists('add_action')) {
