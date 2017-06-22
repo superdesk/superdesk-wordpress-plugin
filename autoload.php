@@ -14,12 +14,44 @@ if ($obj['type'] == 'text') {
   $settings = get_option('superdesk_settings');
 
   if ($obj['pubstatus'] == 'usable') {
+    if (isset($obj['evolvedfrom'])) {
+      $guid = wp_strip_all_tags($obj['evolvedfrom']);
+    } else {
+      $guid = wp_strip_all_tags($obj['guid']);
+    }
+
+    $sync = $wpdb->get_row("SELECT post_id FROM " . $wpdb->prefix . DB_TABLE_SYNC_POST . " WHERE guid = '" . $guid . "'");
+
+    $append = false;
+    $prepend = false;
+    $updateText = '';
+    if($sync && $settings['update-log-option'] == 'on'){
+        $updateText = $settings['update-log-text'] . ' '. date( $settings['update-log-date-format']). '.';
+        if($settings['update-log-position'] == 'on'){
+            $prepend = true;
+        }else{
+            $append = true;
+        }
+    }
+
     if (!empty($obj['located'])) {
+      if($settings['location-modifier'] == 'all-caps'){
+      	$obj['located'] = mb_strtoupper($obj['located']);
+      }
       $content = $obj['description_html'] . "<!--more-->";
-      $content .= '<p>' . wp_strip_all_tags($obj['located']) . $settings['separator-located'];
+      $content .= '<p>';
+      if($prepend){
+        $content .= $updateText .'<br>';
+      }
+      $content .= wp_strip_all_tags($obj['located']) . $settings['separator-located'];
       $content .= mb_substr($obj['body_html'], mb_strpos($obj['body_html'], '>') + 1, mb_strlen($obj['body_html']));
     } else {
-      $content = $obj['description_html'] . "<!--more-->" . $obj['body_html'];
+      $content = $obj['description_html'] . "<!--more-->";
+      $content .= '<p>';
+      if($prepend){
+        $content .= $updateText .'<br>';
+      }
+      $content .= mb_substr($obj['body_html'], mb_strpos($obj['body_html'], '>') + 1, mb_strlen($obj['body_html']));
     }
 
     /* if ($settings['display-copyright'] == "on" && isset($obj['associations']['featuremedia']['copyrightnotice'])) {
@@ -30,10 +62,8 @@ if ($obj['type'] == 'text') {
       $content .= "<p>Editors Note: " . wp_strip_all_tags($obj['ednote']) . "</p>";
     }
 
-    if (isset($obj['evolvedfrom'])) {
-      $guid = wp_strip_all_tags($obj['evolvedfrom']);
-    } else {
-      $guid = wp_strip_all_tags($obj['guid']);
+    if($append){
+       $content .= "<p>".$updateText."</p>"; 
     }
 
     if ($settings['import-keywords'] && $settings['import-keywords'] == 'on') {
@@ -126,7 +156,7 @@ if ($obj['type'] == 'text') {
       $content = embed_images($content, $image);
     }
 
-    $sync = $wpdb->get_row("SELECT post_id FROM " . $wpdb->prefix . DB_TABLE_SYNC_POST . " WHERE guid = '" . $guid . "'");
+    
 
     if ($sync) {
       $post_ID = $sync->post_id;

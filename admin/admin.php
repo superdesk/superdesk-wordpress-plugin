@@ -51,7 +51,6 @@ function superdesk_admin() {
         'author-byline' => $_POST['author-byline'],
         'byline-words' => $_POST['byline-words'],
         'display-copyright' => $_POST['display-copyright'],
-        'convert-keywords' => $_POST['convert-keywords'],
         'import-keywords' => $_POST['import-keywords'],
         'convert-services' => $_POST['convert-services'],
         'subject-type' => $_POST['subject-type'],
@@ -67,6 +66,11 @@ function superdesk_admin() {
         'download-images' => $_POST['download-images'],
         'post-formats' => $_POST['download-images'],
         'post-formats-table' => $resultArray,
+        'location-modifier' => $_POST['location-modifier'],
+        'update-log-option' => $_POST['update-log-option'],
+        'update-log-date-format' => $_POST['update-log-date-format'],
+        'update-log-text' => $_POST['update-log-text'],
+        'update-log-position' => $_POST['update-log-position'],
     );
     update_option('superdesk_settings', $settings);
   } else if (get_option('superdesk_settings')) {
@@ -82,7 +86,6 @@ function superdesk_admin() {
         'author-byline' => '',
         'byline-words' => '',
         'display-copyright' => '',
-        'convert-keywords' => '',
         'import-keywords' => '',
         'convert-services' => '',
         'subject-type' => '',
@@ -98,6 +101,11 @@ function superdesk_admin() {
         'download-images' => '',
         'post-formats' => '',
         'post-formats-table' => array(),
+        'location-modifier' => 'standard',
+        'update-log-option' => 'off',
+        'update-log-date-format' => 'Y-m-d H:i',
+        'update-log-text' => 'This article was updated at',
+        'update-log-position' => 'off'
     );
   }
   $statuses = array(
@@ -175,7 +183,7 @@ function superdesk_admin() {
                   </tr>
                   <tr>
                       <th scope="row">
-                          Status of the ingested articles/posts
+			Default status of ingested articles/posts
                       </th>
                       <td>
                           <fieldset>
@@ -245,30 +253,6 @@ function superdesk_admin() {
                               <label for="status-on">
                                   <input type="radio" name="display-copyright" id="status-on" value="on"<?php
                                   if ($settings['display-copyright'] == 'on') {
-                                    echo(' checked');
-                                  }
-                                  ?>> on
-                              </label>
-                          </fieldset>
-                      </td>
-                  </tr>
-                  <tr>
-                      <th scope="row">
-                          Convert slugline keywords into WP tags
-                      </th>
-                      <td>
-                          <fieldset>
-                              <label for="off">
-                                  <input type="radio" name="convert-keywords" id="off" value="off"<?php
-                                  if ($settings['convert-keywords'] == 'off') {
-                                    echo(' checked');
-                                  }
-                                  ?>> off
-                              </label>
-                              <br>
-                              <label for="on">
-                                  <input type="radio" name="convert-keywords" id="on" value="on"<?php
-                                  if ($settings['convert-keywords'] == 'on') {
                                     echo(' checked');
                                   }
                                   ?>> on
@@ -380,7 +364,7 @@ function superdesk_admin() {
                   </tr>
                   <tr>
                       <th scope="row">
-                          Display the copyrightholder image
+			Display the image copyright holder in the caption
                       </th>
                       <td>
                           <fieldset>
@@ -404,7 +388,7 @@ function superdesk_admin() {
                   </tr>
                   <tr>
                       <th scope="row">
-                          Display the copyrightnotice image
+			Display the image copyright notice in the caption
                       </th>
                       <td>
                           <fieldset>
@@ -434,6 +418,30 @@ function superdesk_admin() {
                           <input type="text" name="separator-located" id="separator-located" class="regular-text" value="<?php echo($settings['separator-located']); ?>">
                       </td>
                   </tr>
+              		 <tr>
+                 		    <th scope="row">
+                                       Display location as
+              		   </th>
+              		   <td>
+              			 <fieldset>
+                              <label for="location-modifier-all-caps">
+                                  <input type="radio" name="location-modifier" id="location-modifier-all-caps" value="all-caps"<?php
+                                  if ($settings['location-modifier'] == 'all-caps') {
+                                    echo(' checked');
+                                  }
+                                  ?>> ALL CAPS
+                              </label>
+                              <br>
+                              <label for="location-modifier-standard">
+                                  <input type="radio" name="location-modifier" id="location-modifier-standard" value="standard"<?php
+                                  if (!isset($settings['location-modifier']) || $settings['location-modifier'] != 'all-caps') {
+                                    echo(' checked');
+                                  }
+                                  ?>> Standard case
+                              </label>
+                          </fieldset>
+                		   </td>
+                		</tr>
                   <tr>
                       <th scope="row">
                           Convert slugline keywords into WP tags
@@ -518,7 +526,75 @@ function superdesk_admin() {
                               </label>
                           </fieldset>
                       </td>
-                  </tr>        
+                  </tr>
+                  <tr>
+                      <th scope="row">
+                          Add update logs to articles 
+                      </th>
+                      <td>
+                          <fieldset>
+                              <label for="update-log-option-off">
+                                  <input type="radio" name="update-log-option" id="update-log-option-off" value="off"<?php
+                                  if (!isset($settings['update-log-option']) || $settings['update-log-option'] == 'off') {
+                                    echo(' checked');
+                                  }
+                                  ?>> off
+                              </label>
+                              <br>
+                              <label for="update-log-option-on">
+                                  <input type="radio" name="update-log-option" id="update-log-option-on" value="on"<?php
+                                  if ($settings['update-log-option'] == 'on') {
+                                    echo(' checked');
+                                  }
+                                  ?>> on
+                              </label>
+                          </fieldset>
+                      </td>
+                  </tr>
+                  <tr>
+                      <th scope="row">
+                          Update log position in article
+                      </th>
+                      <td>
+                          <fieldset>
+                              <label for="update-log-position-off">
+                                  <input type="radio" name="update-log-position" id="update-log-position-off" value="off"<?php
+                                  if (!isset($settings['update-log-position']) || $settings['update-log-position'] == 'off') {
+                                    echo(' checked');
+                                  }
+                                  ?>> append
+                              </label>
+                              <br>
+                              <label for="update-log-position-on">
+                                  <input type="radio" name="update-log-position" id="update-log-position-on" value="on"<?php
+                                  if ($settings['update-log-option'] == 'on') {
+                                    echo(' checked');
+                                  }
+                                  ?>> prepend
+                              </label>
+                          </fieldset>
+                      </td>
+                  </tr>
+
+                  <tr>
+                      <th scope="row">
+                          <label for="update-log-date-format">Update log date format</label>
+                      </th>
+                      <td>
+                          <input type="text" name="update-log-date-format" id="update-log-date-format" class="regular-text" value="<?php echo($settings['update-log-date-format']); ?>">
+                      </td>
+                  </tr>
+                   <tr>
+                      <th scope="row">
+                          <label for="update-log-text">Update log date text</label>
+                      </th>
+                      <td>
+                          <input type="text" name="update-log-text" id="update-log-text" class="regular-text" value="<?php echo(!isset($settings['update-log-text']) ? 'This article was updated at' : $settings['update-log-text']); ?>"> 
+
+                          <?php
+                          echo date(!empty($settings['update-log-date-format']) ? $settings['update-log-date-format'] : 'Y-m-d H:i'); ?>.
+                      </td>
+                  </tr>
                   <tr>
                       <th scope="row">
                           Match Superdesk Content Profiles with Wordpress Post Formats 
