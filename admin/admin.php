@@ -286,7 +286,7 @@ function superdesk_admin() {
                   </tr>
                   <tr>
                       <th scope="row">
-                          Import Superdesk categories as Wordpress categories
+                          Import Superdesk categories as WordPress categories
                       </th>
                       <td>
                           <fieldset>
@@ -319,7 +319,7 @@ function superdesk_admin() {
                                   if ($settings['subject-type'] == 'tags' || !$settings['subject-type'] || $settings['subject-type'] == null) {
                                     echo(' checked');
                                   }
-                                  ?>> Wordpress tags
+                                  ?>> WordPress tags
                               </label>
                               <br>
                               <label for="categories">
@@ -327,7 +327,7 @@ function superdesk_admin() {
                                   if ($settings['subject-type'] == 'categories') {
                                     echo(' checked');
                                   }
-                                  ?>> Wordpress categories
+                                  ?>> WordPress categories
                               </label>
                           </fieldset>
                       </td>
@@ -597,7 +597,7 @@ function superdesk_admin() {
                   </tr>
                   <tr>
                       <th scope="row">
-                          Match Superdesk Content Profiles with Wordpress Post Formats 
+                          Match Superdesk Content Profiles with WordPress Post Formats 
                       </th>
                       <td>
                           <fieldset>
@@ -625,7 +625,7 @@ function superdesk_admin() {
                               <thead>
                                   <tr>
                                       <th>Superdesk Content Profile Name</th>
-                                      <th>Wordpress Post Format</th>
+                                      <th>WordPress Post Format</th>
                                       <th><a href="javascript:rowAddFunction();">Add row</a></th>
                                   </tr>
                               </thead>
