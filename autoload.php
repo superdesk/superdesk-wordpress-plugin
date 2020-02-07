@@ -94,10 +94,10 @@ if ($obj['type'] == 'text') {
         $categoryExist = $wpdb->get_row("SELECT terms.term_id, term_taxonomy.term_taxonomy_id FROM " . $wpdb->prefix . "terms terms JOIN " . $wpdb->prefix . "term_taxonomy term_taxonomy ON term_taxonomy.term_id = terms.term_id WHERE term_taxonomy.taxonomy = 'category' AND terms.name = '" . wp_strip_all_tags($subject['name']) . "'");
 
         if ($categoryExist) {
-          $taxonomyCategory[] = $categoryExist->term_taxonomy_id;
+          $taxonomyCategory[] = $categoryExist->term_id;
         } else {
           $category_id = wp_insert_term(wp_strip_all_tags($subject['name']), 'category');
-          $taxonomyCategory[] = $category_id['term_taxonomy_id'];
+          $taxonomyCategory[] = $category_id['term_id'];
         }
       }
     }
@@ -107,10 +107,10 @@ if ($obj['type'] == 'text') {
         $categoryExist = $wpdb->get_row("SELECT terms.term_id, term_taxonomy.term_taxonomy_id FROM " . $wpdb->prefix . "terms terms JOIN " . $wpdb->prefix . "term_taxonomy term_taxonomy ON term_taxonomy.term_id = terms.term_id WHERE term_taxonomy.taxonomy = 'category' AND terms.name = '" . wp_strip_all_tags($service['name']) . "'");
 
         if ($categoryExist) {
-          $taxonomyCategory[] = $categoryExist->term_taxonomy_id;
+          $taxonomyCategory[] = $categoryExist->term_id;
         } else {
           $category_id = wp_insert_term(wp_strip_all_tags($service['name']), 'category');
-          $taxonomyCategory[] = $category_id['term_taxonomy_id'];
+          $taxonomyCategory[] = $category_id['term_id'];
         }
       }
     }
