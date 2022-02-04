@@ -64,7 +64,7 @@ function superdesk_admin() {
         'slugline-ignored' => $_POST['slugline-ignored'],
         'priority_threshhold' => $_POST['priority_threshhold'],
         'download-images' => $_POST['download-images'],
-        'post-formats' => $_POST['download-images'],
+        'post-formats' => $_POST['post-formats'],
         'post-formats-table' => $resultArray,
         'location-modifier' => $_POST['location-modifier'],
         'update-log-option' => $_POST['update-log-option'],
