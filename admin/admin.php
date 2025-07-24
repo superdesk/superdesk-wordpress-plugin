@@ -6,7 +6,7 @@ add_filter('plugin_action_links_superdesk/superdeskPublisher.php', '_plugin_acti
 //var_dump(get_post_format_strings());die();
 
 function superdesk_admin_actions() {
-  add_options_page('SUPERDESK', 'Superdesk Publisher', 'manage_options', __FILE__, 'superdesk_admin');
+  add_options_page('SUPERDESK', 'Superdesk', 'manage_options', __FILE__, 'superdesk_admin');
 }
 
 function _plugin_action_links($links) {
@@ -141,7 +141,7 @@ function superdesk_admin() {
   }
   ?>
   <div class="wrap">
-      <h2>Superdesk Publisher</h2>
+      <h2>Superdesk</h2>
       <form action="" method="POST">
           <table class="form-table">
               <tbody>

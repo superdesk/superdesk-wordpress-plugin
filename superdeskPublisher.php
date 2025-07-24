@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Plugin Name: Superdesk Publisher
+ * Plugin Name: Superdesk
  * Plugin URI: 
- * Description: Imports articles in the IPTC ninjs format from the Superdesk newsroom system
- * Version: 0.9.2
- * Author: Sourcefabric and AdminIT
+ * Description: Receives articles in the IPTC ninjs format from the Superdesk newsroom system and stores them in WordPress.
+ * Version: 0.9.5
+ * Author: Sourcefabric
  */
 if (!function_exists('add_action')) {
   echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
