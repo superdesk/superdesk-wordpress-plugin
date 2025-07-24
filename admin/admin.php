@@ -147,7 +147,7 @@ function superdesk_admin() {
               <tbody>
                   <tr>
                       <th>Autoload</th>
-                      <td><?php echo get_site_url(); ?>/wp-content/plugins/superdesk-wordpress-plugin/autoload.php</td>
+                      <td><?php echo get_site_url(); ?>/wp-content/plugins/superdesk/autoload.php</td>
                   </tr>
                   <tr>
                       <th scope="row">
