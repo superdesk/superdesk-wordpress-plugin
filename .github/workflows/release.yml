@@ -1,0 +1,41 @@
+name: Build Superdesk WordPress Plugin
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Create superdesk directory
+      run: mkdir -p superdesk
+      
+    - name: Copy project files to superdesk directory
+      run: |
+        # Copy all files except git and github specific ones
+        cp -r . superdesk/ || true
+        # Remove git and github specific files/directories
+        rm -rf superdesk/.git
+        rm -rf superdesk/.github
+        rm -f superdesk/.gitignore
+        rm -f superdesk/.gitmodules
+        rm -f superdesk/.gitattributes
+        # Remove the nested superdesk directory to avoid recursion
+        rm -rf superdesk/superdesk
+      
+    - name: Create zip file
+      run: zip -r superdesk-wordpress-plugin.zip superdesk/
+      
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: superdesk-wordpress-plugin
+        path: superdesk-wordpress-plugin.zip
