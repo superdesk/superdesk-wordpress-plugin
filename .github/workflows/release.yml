@@ -2,22 +2,22 @@ name: Build Superdesk WordPress Plugin
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main, master, develop ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main, master, develop ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
+
     - name: Create superdesk directory
       run: mkdir -p superdesk
-      
+
     - name: Copy project files to superdesk directory
       run: |
         # Copy all files except git and github specific ones
@@ -30,12 +30,14 @@ jobs:
         rm -f superdesk/.gitattributes
         # Remove the nested superdesk directory to avoid recursion
         rm -rf superdesk/superdesk
-      
+
     - name: Create zip file
       run: zip -r superdesk-wordpress-plugin.zip superdesk/
-      
-    - name: Upload artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: superdesk-wordpress-plugin
-        path: superdesk-wordpress-plugin.zip
+
+    - name: Commit and push zip file
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add superdesk-wordpress-plugin.zip
+        git commit -m "Add built plugin zip file" || exit 0
+        git push
